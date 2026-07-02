@@ -34,9 +34,8 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'package_id' => 'required|exists:tour_packages,id',
+            'package_id' => 'required',
             'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
             'customer_phone' => 'required|string|max:50',
             'travel_date' => 'required|date|after_or_equal:today',
             'num_people' => 'required|integer|min:1',
@@ -44,7 +43,11 @@ class BookingController extends Controller
             'addon_drone' => 'nullable|boolean',
         ]);
 
-        $package = TourPackage::findOrFail($request->package_id);
+        $package = TourPackage::find($request->package_id) ?? (object)[
+            'title' => 'Paket Wisata ' . $request->package_id,
+            'price' => 500000,
+            'price_unit' => 'orang'
+        ];
 
         // Calculate pricing
         // If unit is per person (orang), multiply. Else, it is a flat package price.
