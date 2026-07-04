@@ -283,19 +283,27 @@ class BookingController extends Controller
                 CURLOPT_POSTFIELDS => array(
                     'target' => $phone,
                     'message' => $message,
-                    'countryCode' => '62',
                 ),
                 CURLOPT_HTTPHEADER => array(
                     "Authorization: $token"
                 ),
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
             ));
 
             $response = curl_exec($curl);
+            $err = curl_error($curl);
             curl_close($curl);
+            
+            if ($err) {
+                \Log::error("Fonnte cURL Error: " . $err);
+                return false;
+            }
+            
             \Log::info("Fonnte API Response: " . $response);
             return true;
         } catch (\Exception $e) {
-            \Log::error("Fonnte API Error: " . $e->getMessage());
+            \Log::error("Fonnte API Exception: " . $e->getMessage());
             return false;
         }
     }
